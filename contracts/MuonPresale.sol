@@ -82,6 +82,10 @@ contract MuonPresale is Ownable{
         muon = MuonV01(addr);
     }
 
+    function setIsRunning(bool) public onlyOwner{
+        running = bool;
+    }
+
     function emergencyWithdrawETH(uint256 amount, address addr) public onlyOwner{
         require(addr != address(0));
         payable(addr).transfer(amount);
