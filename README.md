@@ -1,4 +1,4 @@
-# Deus Stake & Yeild conntracts
+# Muon presale contracts
 
 # Compile
 $ npm install  
