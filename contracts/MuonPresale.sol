@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "./MuonV01.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 interface StandardToken {
@@ -17,7 +16,6 @@ interface StandardToken {
 }
 
 contract MuonPresale is Ownable{
-    using SafeMath for uint256;
     using ECDSA for bytes32;
 
     MuonV01 muon;
@@ -62,7 +60,7 @@ contract MuonPresale is Ownable{
 
         // check max
         uint256 usdAmount = amount.mul(tokenPrice).div(1 ether);
-        require(balances[forAddress].add(usdAmount) <= addressMaxCap, ">max");
+        require(balances[forAddress] + usdAmount <= addressMaxCap, ">max");
 
         // TODO: check time
 
@@ -73,12 +71,12 @@ contract MuonPresale is Ownable{
             tokenCon.transferFrom(address(msg.sender), address(this), amount);
         }
 
-        balances[forAddress] = balances[forAddress].add(usdAmount);
+        balances[forAddress] = balances[forAddress] + usdAmount;
         emit Deposit(token, tokenPrice, amount, 
             time, msg.sender, forAddress, addressMaxCap);
     }
 
-    function setMounContract(address addr) public onlyOwner{
+    function setMuonContract(address addr) public onlyOwner{
         muon = MuonV01(addr);
     }
 
