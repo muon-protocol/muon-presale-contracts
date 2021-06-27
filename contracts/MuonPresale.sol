@@ -59,7 +59,9 @@ contract MuonPresale is Ownable{
         // require(verified, '!verified');
 
         // check max
-        uint256 usdAmount = amount.mul(tokenPrice).div(1 ether);
+        uint256 usdAmount = amount * tokenPrice /
+            (10 ** (token == address(0) ? 18 : StandardToken(token).decimals())
+        );
         require(balances[forAddress] + usdAmount <= addressMaxCap, ">max");
 
         // TODO: check time
@@ -80,8 +82,8 @@ contract MuonPresale is Ownable{
         muon = MuonV01(addr);
     }
 
-    function setIsRunning(bool) public onlyOwner{
-        running = bool;
+    function setIsRunning(bool val) public onlyOwner{
+        running = val;
     }
 
     function emergencyWithdrawETH(uint256 amount, address addr) public onlyOwner{
