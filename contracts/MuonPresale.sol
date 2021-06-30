@@ -91,6 +91,11 @@ contract MuonPresale is Ownable{
         maxMuonDelay = delay;
     }
 
+    function emergencyWithdrawETH(uint256 amount, address addr) public onlyOwner{
+        require(addr != address(0));
+        payable(addr).transfer(amount);
+    }
+
     function emergencyWithdrawERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
         StandardToken(_tokenAddr).transfer(_to, _amount);
     }
