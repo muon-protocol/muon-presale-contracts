@@ -12,6 +12,9 @@ contract MuonV01 is Ownable {
 
     mapping(address => bool) public signers;
 
+    constructor(){
+    }
+
     function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
         uint i;
         address signer;
