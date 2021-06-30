@@ -18,11 +18,13 @@ interface StandardToken {
 contract MuonPresale is Ownable{
     using ECDSA for bytes32;
 
-    MuonV01 muon;
+    MuonV01 public muon;
     
     mapping (address => uint256) public balances;
 
-    bool running = true;
+    bool public running = true;
+
+    uint256 public maxMuonDelay = 15 minutes;
 
     event Deposit(address token, uint256 tokenPrice, uint256 amount, 
         uint256 time, address fromAddress, address forAddress, 
@@ -54,9 +56,8 @@ contract MuonPresale is Ownable{
             amount, time, forAddress, addressMaxCap));
         hash = hash.toEthSignedMessageHash();
 
-        // TODO: uncomment        
-        // bool verified = muon.verify(_reqId, hash, sigs);
-        // require(verified, '!verified');
+        bool verified = muon.verify(_reqId, hash, sigs);
+        require(verified, '!verified');
 
         // check max
         uint256 usdAmount = amount * tokenPrice /
@@ -64,7 +65,7 @@ contract MuonPresale is Ownable{
         );
         require(balances[forAddress] + usdAmount <= addressMaxCap, ">max");
 
-        // TODO: check time
+        require(time + maxMuonDelay > block.timestamp, "muon: expired");
 
         if(token == address(0)){
             require(amount == msg.value, "amount err");
@@ -86,9 +87,12 @@ contract MuonPresale is Ownable{
         running = val;
     }
 
-    function emergencyWithdrawETH(uint256 amount, address addr) public onlyOwner{
-        require(addr != address(0));
-        payable(addr).transfer(amount);
+    function setIsRunning(bool val) public onlyOwner{
+        running = val;
+    }    
+
+    function setMaxMuonDelay(uint256 delay) public onlyOwner{
+        maxMuonDelay = delay;
     }
 
     function emergencyWithdrawERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
