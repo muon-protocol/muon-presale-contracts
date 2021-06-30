@@ -87,10 +87,6 @@ contract MuonPresale is Ownable{
         running = val;
     }
 
-    function setIsRunning(bool val) public onlyOwner{
-        running = val;
-    }    
-
     function setMaxMuonDelay(uint256 delay) public onlyOwner{
         maxMuonDelay = delay;
     }
