@@ -33,10 +33,11 @@ contract MuonPresaleV2 is Ownable {
     MuonV01 public muon;
 
     mapping(address => uint256) public balances;
+    mapping(address => uint256) public lastTimes;
 
     bool public running = true;
 
-    uint256 public maxMuonDelay = 15 minutes;
+    uint256 public maxMuonDelay = 5 minutes;
 
     event Deposit(
         address token,
@@ -100,6 +101,13 @@ contract MuonPresaleV2 is Ownable {
         require(balances[forAddress] + usdAmount <= addressMaxCap[0], ">max");
 
         require(time + maxMuonDelay > block.timestamp, "muon: expired");
+        
+        require(
+            time - lastTimes[forAddress] > maxMuonDelay,
+            "duplicate"
+        );
+
+        lastTimes[forAddress] = time;
 
         if (token == address(0)) {
             require(amount == msg.value, "amount err");

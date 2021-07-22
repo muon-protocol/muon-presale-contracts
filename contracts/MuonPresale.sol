@@ -46,6 +46,7 @@ contract MuonPresale is Ownable{
         uint256 time,
         address forAddress,
         uint256 addressMaxCap,
+        //uint256 chainId,
         bytes calldata _reqId, 
         bytes[] calldata sigs
     ) public payable isRunning{
