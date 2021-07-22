@@ -25,7 +25,7 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 require('dotenv').config()
-const HDWalletProvider = require("@truffle/hdwallet-provider");
+const HDWalletProvider = require('@truffle/hdwallet-provider')
 console.log('https://ropsten.infura.io/v3/' + process.env.INFURA_KEY)
 module.exports = {
   /**
@@ -126,8 +126,25 @@ module.exports = {
       timeoutBlocks: 200,
       gas: 5500000,
       skipDryRun: true
+    },
+    xdai: {
+      provider: () =>
+        new HDWalletProvider(process.env.PK, `https://rpc.xdaichain.com/`),
+      network_id: 100,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      gas: 5500000,
+      skipDryRun: true
+    },
+    sokol: {
+      provider: () =>
+        new HDWalletProvider(process.env.PK, `https://sokol.poa.network`),
+      network_id: 77,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      gas: 5500000,
+      skipDryRun: true
     }
-
     // Useful for private networks
     // private: {
     //   provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
