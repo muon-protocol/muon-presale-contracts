@@ -25,21 +25,33 @@ contract MuonV01 is Ownable {
         signers[0x27a58c0e7688F90B415afA8a1BfA64D48A835DF7] = true;
         signers[0x11C57ECa88e4A40b7B041EF48a66B9a0EF36b830] = true;
     }
+    
+    // Note: view function is for getting the signer of signatures
+    function getSigners(bytes32 hash, bytes[] calldata sigs) public view returns(address[]) {
+        address[] signerArr;
+        for(i=0; i<sigs.length; i++) {
+            signerArr[i] = hash.recover(sigs[i]);
+        }
+        return signerArr;
+    }
 
-    function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
+    // Note: signatures must be in an ascending order
+    function verify(bytes calldata _reqId, uint256 minimumRequiredSignature, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
         uint i;
         address signer;
-        for(i=0 ; i<sigs.length ; i++){
+        address lastSigner;
+        for(i=0 ; i<minimumRequiredSignature; i++){
             signer = hash.recover(sigs[i]);
             // require(attualSigner == signer, "Signature not confirmed");
-            if(signers[signer] != true)
+            if(signers[signer] != true || signer <= lastSigner)
                 return false;
+            lastSigner = signer;
         }
         if(sigs.length > 0){
             emit Transaction(_reqId);
             return true;
         }
-        else{
+        else {
             return false;
         }
     }
