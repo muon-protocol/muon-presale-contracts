@@ -24,7 +24,6 @@ contract MuonV01 is Ownable {
 		signers[0x11C57ECa88e4A40b7B041EF48a66B9a0EF36b830] = true;
 	}
 
-
     // Note: signatures must be in an ascending order
     function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
         uint i;
@@ -53,7 +52,6 @@ contract MuonV01 is Ownable {
 	function ownerRemoveSigner(address _signer) public onlyOwner {
 		delete signers[_signer];
 	}
-
 
 	event Transaction(bytes reqId);
 }
