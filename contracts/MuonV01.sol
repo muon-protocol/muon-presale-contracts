@@ -7,11 +7,10 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract MuonV01 is Ownable {
 	using ECDSA for bytes32;
-	
-	uint256 minimumRequiredSignature;
+
 	mapping(address => bool) public signers;
 
-	constructor(uint256 _minimumRequiredSignature){
+	constructor(){
 		//initial nodes
 		signers[0x06A85356DCb5b307096726FB86A78c59D38e08ee] = true;
 		signers[0x4513218Ce2e31004348Fd374856152e1a026283C] = true;
@@ -23,33 +22,28 @@ contract MuonV01 is Ownable {
 		signers[0x031e6efe16bCFB88e6bfB068cfd39Ca02669Ae7C] = true;
 		signers[0x27a58c0e7688F90B415afA8a1BfA64D48A835DF7] = true;
 		signers[0x11C57ECa88e4A40b7B041EF48a66B9a0EF36b830] = true;
-		minimumRequiredSignature = _minimumRequiredSignature;
 	}
 
-	function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
-		uint i;
-		address signer;
-		mapping(address => bool) isduplicate;
-		for(i=0; i<minimumRequiredSignature; i++){
-			signer = hash.recover(sigs[i]);
-			if(signers[signer] != true || isduplicate[signer])
-				return false;
-			isduplicate[signer] = true;
-		}
-		if(sigs.length > 0){
-			emit Transaction(_reqId);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	function setMinimumRequiredSignature(uint256 _minimumRequiredSignature) external onlyOwner {
-		minimumRequiredSignature = _minimumRequiredSignature;
-
-		emit MinimumRequiredSignatureSet(_minimumRequiredSignature);
-	}
+    // Note: signatures must be in an ascending order
+    function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
+        uint i;
+        address signer;
+        address lastSigner;
+        for(i=0 ; i<sigs.length; i++){
+            signer = hash.recover(sigs[i]);
+            // require(attualSigner == signer, "Signature not confirmed");
+            if(signers[signer] != true || signer <= lastSigner)
+                return false;
+            lastSigner = signer;
+        }
+        if(sigs.length > 0){
+            emit Transaction(_reqId);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
 	function ownerAddSigner(address _signer) public onlyOwner {
 		signers[_signer] = true;
@@ -59,7 +53,5 @@ contract MuonV01 is Ownable {
 		delete signers[_signer];
 	}
 
-
 	event Transaction(bytes reqId);
-	event MinimumRequiredSignatureSet(uint256 minimumRequiredSignature);
 }
