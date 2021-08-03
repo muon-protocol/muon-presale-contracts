@@ -10,6 +10,8 @@ contract MuonV01 is Ownable {
 	
 	uint256 minimumRequiredSignature;
 	mapping(address => bool) public signers;
+	mapping (bytes32 => bool) private isDuplicate;
+    uint256 private currentMappingVersion = 0;
 
 	constructor(uint256 _minimumRequiredSignature){
 		//initial nodes
@@ -29,12 +31,15 @@ contract MuonV01 is Ownable {
 	function verify(bytes calldata _reqId, bytes32 hash, bytes[] calldata sigs) public returns (bool) {
 		uint i;
 		address signer;
-		mapping(address => bool) isduplicate;
+		bytes32 key;
+        currentMappingVersion++;
 		for(i=0; i<minimumRequiredSignature; i++){
 			signer = hash.recover(sigs[i]);
-			if(signers[signer] != true || isduplicate[signer])
+			key = keccak256(abi.encodePacked(currentMappingVersion, signer));
+			if(signers[signer] != true || isDuplicate[key]) {
 				return false;
-			isduplicate[signer] = true;
+			}
+			isDuplicate[key] = true;
 		}
 		if(sigs.length > 0){
 			emit Transaction(_reqId);
